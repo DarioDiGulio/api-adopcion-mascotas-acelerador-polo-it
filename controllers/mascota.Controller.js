@@ -34,8 +34,8 @@ async function RegistrarMascota(req, res) {
       foto_url
     });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Error al guardar la mascota' });
+    console.error('Erro en RegistrarMascota:', err);
+    res.status(500).json({ error: err.message });
   }
 };
 
