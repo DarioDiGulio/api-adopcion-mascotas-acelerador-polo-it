@@ -1,33 +1,48 @@
-const db = require('../config/db.js');
+const pool = require('../config/db.js');
+const cloudinary = require('../config/cloudinary.js');
+const fs = require('fs');
 
 //Registrar mascota
 
 async function RegistrarMascota(req, res) {
     
-    try { 
-        const { nombre,direccion,tipo,raza,edad,propietario  } = req.body;
-        //Validar que no esten vacios los campos
-        if (!nombre || !direccion || !tipo || !raza || !edad || !propietario) {
-            return res.status(400).json({ message: 'Todos los campos son obligatorios' });
-        }
+    try {
+    const { nombre, direccion, tipo, raza, edad, propietario } = req.body;
 
-        //Insertar la mascota a la base de datos
-        const [result] = await db.execute(
-            'INSERT INTO mascotas (nombre, direccion, tipo, raza, edad, propietario) VALUES (?, ?, ?, ?, ?, ?)',
-            [nombre, direccion, tipo, raza, edad, propietario]
-        );
+    let foto_url = null;
+    if (req.file) {
+      const result = await cloudinary.uploader.upload(req.file.path, {
+        folder: 'mascotas'
+      });
+      foto_url = result.secure_url;
+      fs.unlinkSync(req.file.path); // elimina archivo temporal
+    }
 
-        res.status(201).json({ message: 'Mascota registrada exitosamente', id: result.insertId });
-    } catch (error) {
-        console.error('Error al registrar la mascota:', error);
-        res.status(500).json({ message: 'Error al registrar la mascota' });
-    }   
-}
+    const [rows] = await pool.query(
+      'INSERT INTO mascotas (nombre, direccion, tipo, raza, edad, propietario, foto_url) VALUES (?, ?, ?, ?, ?, ?, ?)',
+      [nombre, direccion, tipo, raza, edad, propietario, foto_url]
+    );
+
+    res.json({
+      id: rows.insertId,
+      nombre,
+      direccion,
+      tipo,
+      raza,
+      edad,
+      propietario,
+      foto_url
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Error al guardar la mascota' });
+  }
+};
 
 //Obtener todas las mascotas
 async function obtenerMascotas(req, res) {
     try {
-        const[mascotas] = await db.execute('SELECT * FROM mascotas');
+        const[mascotas] = await pool.execute('SELECT * FROM mascotas');
         res.json(mascotas);
     } catch (error) {
         console.error('Error al obtener las mascotas:', error);
@@ -39,7 +54,7 @@ async function obtenerMascotas(req, res) {
 async function obtenerMascota(req, res) {
     try {
         const { id } = req.params;
-        const [mascota] = await db.execute('SELECT * FROM mascotas WHERE id = ?', [id]);
+        const [mascota] = await pool.execute('SELECT * FROM mascotas WHERE id = ?', [id]);
         if (mascota.length === 0) {
             return res.status(404).json({ message: 'Mascota no encontrada' });
         }
@@ -58,7 +73,7 @@ async function actualizarMascota(req, res) {
         if (!nombre || !direccion || !tipo || !raza || !edad || !propietario) {
             return res.status(400).json({ message: 'Todos los campos son obligatorios' });
         }
-        const [result] = await db.execute(
+        const [result] = await pool.execute(
             'UPDATE mascotas SET nombre = ?, direccion = ?, tipo = ?, raza = ?, edad = ?, propietario = ? WHERE id = ?',
             [nombre, direccion, tipo, raza, edad, propietario, id]
         );
@@ -76,7 +91,7 @@ async function actualizarMascota(req, res) {
 async function eliminarMascota(req, res) {
     try {
         const { id } = req.params;
-        const [result] = await db.execute('DELETE FROM mascotas WHERE id = ?', [id]);
+        const [result] = await pool.execute('DELETE FROM mascotas WHERE id = ?', [id]);
         if (result.affectedRows === 0) {
             return res.status(404).json({ message: 'Mascota no encontrada' });
         }

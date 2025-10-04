@@ -8,5 +8,6 @@ CREATE TABLE mascotas (
     tipo VARCHAR(50) NOT NULL,
     raza VARCHAR(100) NOT NULL,
     edad INT NOT NULL,
-    propietario VARCHAR(100) NOT NULL
+    propietario VARCHAR(100) NOT NULL,
+    foto_url VARCHAR(255)
 );

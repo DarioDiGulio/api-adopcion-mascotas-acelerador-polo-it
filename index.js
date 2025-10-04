@@ -1,6 +1,6 @@
 const express = require('express');
 const cors = require('cors');
-const router = express.Router();
+
 const mascotaRouter = require('./router/mascota.Router');
 
 const app = express();

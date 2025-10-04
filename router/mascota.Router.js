@@ -1,5 +1,7 @@
 const express = require('express');
 const router = express.Router();
+const multer = require('multer');
+
 const {
     RegistrarMascota,
     obtenerMascota,
@@ -8,9 +10,10 @@ const {
     eliminarMascota     
 
 } = require('../controllers/mascota.Controller');
+const upload = multer({ dest: 'uploads/' });
 
 // Crear una nueva mascota
-router.post('/mascota', RegistrarMascota);
+router.post('/mascota',upload.single('foto'), RegistrarMascota);
 
 // Obtener todas las mascotas
 router.get('/mascotas', obtenerMascotas);
