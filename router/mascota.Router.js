@@ -15,6 +15,9 @@ const upload = multer({ dest: 'uploads/' });
 // Crear una nueva mascota
 router.post('/mascota',upload.single('foto'), RegistrarMascota);
 
+// Crear una nueva mascota sin foto
+router.post('/mascota-simple', RegistrarMascota);
+
 // Obtener todas las mascotas
 router.get('/mascotas', obtenerMascotas);
 // Obtener una mascota por ID
