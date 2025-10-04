@@ -5,7 +5,9 @@ const fs = require('fs');
 //Registrar mascota
 
 async function RegistrarMascota(req, res) {
-    
+    console.log('req.body:', req.body);
+    console.log('req.file:', req.file);
+
     try {
     const { nombre, direccion, tipo, raza, edad, propietario } = req.body;
 
