@@ -15,7 +15,11 @@ app.use((req, res, next) => {
   next();
 });
 app.use(express.urlencoded({ extended: true }));
-app.use(cors());
+app.use(cors({
+  origin: '*', // o el dominio exacto de tu HTML
+  methods: ['GET','POST','PUT','DELETE'],
+  allowedHeaders: ['Content-Type']
+}));
 
 
 app.use('/', mascotaRouter);
