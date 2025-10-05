@@ -11,10 +11,12 @@ const {
     eliminarMascota     
 
 } = require('../controllers/mascota.Controller');
-const upload = multer({ dest: 'uploads/' });
+//memoria para multer
+const storage = multer.memoryStorage();
+const upload = multer({ storage });
 
 // Crear una nueva mascota
-router.post('/mascota',upload.single('foto'), RegistrarMascota);
+router.post('/mascota', RegistrarMascota);
 
 //Subir imagen 
 router.post('/mascota/:id/foto', upload.single('foto'), SubirImgMascota);

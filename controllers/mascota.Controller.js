@@ -1,57 +1,51 @@
 const pool = require('../config/db.js');
 const cloudinary = require('../config/cloudinary.js');
-const fs = require('fs');
 
-//Registrar mascota
-
+// Registrar mascota (solo JSON)
 async function RegistrarMascota(req, res) {
-    console.log('req.body:', req.body);
-    console.log('req.file:', req.file);
-
     try {
-    const { nombre, direccion, tipo, raza, edad, propietario } = req.body;
+        const { nombre, direccion, tipo, raza, edad, propietario } = req.body;
 
-    
-    let foto_url = null;
-    const [rows] = await pool.query(
-      'INSERT INTO mascotas (nombre, direccion, tipo, raza, edad, propietario, foto_url) VALUES (?, ?, ?, ?, ?, ?, ?)',
-      [nombre, direccion, tipo, raza, edad, propietario, foto_url]
-    );
+        const [rows] = await pool.query(
+          'INSERT INTO mascotas (nombre, direccion, tipo, raza, edad, propietario, foto_url) VALUES (?, ?, ?, ?, ?, ?, ?)',
+          [nombre, direccion, tipo, raza, edad, propietario, null]
+        );
 
-    res.json({
-      id: rows.insertId,
-      nombre,
-      direccion,
-      tipo,
-      raza,
-      edad,
-      propietario,
-      foto_url
-    });
-  } catch (err) {
-    console.error('Erro en RegistrarMascota:', err);
-    res.status(500).json({ error: err.message });
-  }
-};
-//Subir imagen
+        res.json({
+          message: 'Mascota registrada exitosamente',
+          id: rows.insertId
+        });
+    } catch (err) {
+        console.error('Error en RegistrarMascota:', err);
+        res.status(500).json({ error: err.message });
+    }
+}
+
+// Subir imagen usando memoria (sin tocar disco)
 async function SubirImgMascota(req, res) {
     try {
-        const{id} = req.params;
-        if (!req.file) {
-            return res.status(400).json({ message: 'No se ha subido ninguna imagen' });
-        }
-        const result = await cloudinary.uploader.upload(req.file.path, {
-            folder: 'mascotas'
+        const { id } = req.params;
+
+        if (!req.file) return res.status(400).json({ message: 'No se ha subido ninguna imagen' });
+
+        const result = await new Promise((resolve, reject) => {
+            const stream = cloudinary.uploader.upload_stream(
+                { folder: 'mascotas' },
+                (error, result) => {
+                    if (error) reject(error);
+                    else resolve(result);
+                }
+            );
+            stream.end(req.file.buffer); // req.file.buffer contiene el archivo en memoria
         });
-        
-        fs.unlinkSync(req.file.path);
 
         await pool.execute('UPDATE mascotas SET foto_url = ? WHERE id = ?', [result.secure_url, id]);
-    res.json({ message: 'Imagen subida exitosamente', url: result.secure_url });
-    }
-    catch (error) {
+
+        res.json({ message: 'Imagen subida exitosamente', url: result.secure_url });
+
+    } catch (error) {
         console.error('Error al subir la imagen:', error);
-        res.status(500).json({ message: 'Error al subir la imagen' });
+        res.status(500).json({ message: 'Error al subir la imagen', error: error.message });
     }
 }
 //Obtener todas las mascotas
