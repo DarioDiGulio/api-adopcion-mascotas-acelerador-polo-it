@@ -12,7 +12,7 @@ async function RegistrarMascota(req, res) {
     const { nombre, direccion, tipo, raza, edad, propietario } = req.body;
 
     
-
+    let foto_url = null;
     const [rows] = await pool.query(
       'INSERT INTO mascotas (nombre, direccion, tipo, raza, edad, propietario, foto_url) VALUES (?, ?, ?, ?, ?, ?, ?)',
       [nombre, direccion, tipo, raza, edad, propietario, foto_url]
