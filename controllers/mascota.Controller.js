@@ -25,6 +25,8 @@ async function RegistrarMascota(req, res) {
 async function SubirImgMascota(req, res) {
     try {
         const { id } = req.params;
+        console.log('Parametros recibidos:', req.params); 
+        console.log('Archivo recibido:', req.file);       
 
         if (!req.file) return res.status(400).json({ message: 'No se ha subido ninguna imagen' });
 
