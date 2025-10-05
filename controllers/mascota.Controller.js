@@ -11,14 +11,7 @@ async function RegistrarMascota(req, res) {
     try {
     const { nombre, direccion, tipo, raza, edad, propietario } = req.body;
 
-    let foto_url = null;
-    if (req.file) {
-      const result = await cloudinary.uploader.upload(req.file.path, {
-        folder: 'mascotas'
-      });
-      foto_url = result.secure_url;
-      fs.unlinkSync(req.file.path); // elimina archivo temporal
-    }
+    
 
     const [rows] = await pool.query(
       'INSERT INTO mascotas (nombre, direccion, tipo, raza, edad, propietario, foto_url) VALUES (?, ?, ?, ?, ?, ?, ?)',
@@ -40,7 +33,27 @@ async function RegistrarMascota(req, res) {
     res.status(500).json({ error: err.message });
   }
 };
+//Subir imagen
+async function SubirImgMascota(req, res) {
+    try {
+        const{id} = req.params;
+        if (!req.file) {
+            return res.status(400).json({ message: 'No se ha subido ninguna imagen' });
+        }
+        const result = await cloudinary.uploader.upload(req.file.path, {
+            folder: 'mascotas'
+        });
+        
+        fs.unlinkSync(req.file.path);
 
+        await pool.execute('UPDATE mascotas SET foto_url = ? WHERE id = ?', [result.secure_url, id]);
+    res.json({ message: 'Imagen subida exitosamente', url: result.secure_url });
+    }
+    catch (error) {
+        console.error('Error al subir la imagen:', error);
+        res.status(500).json({ message: 'Error al subir la imagen' });
+    }
+}
 //Obtener todas las mascotas
 async function obtenerMascotas(req, res) {
     try {
@@ -106,6 +119,7 @@ async function eliminarMascota(req, res) {
 
 module.exports = {
     RegistrarMascota,
+    SubirImgMascota,
     obtenerMascota,
     obtenerMascotas,
     actualizarMascota,

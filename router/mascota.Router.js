@@ -4,6 +4,7 @@ const multer = require('multer');
 
 const {
     RegistrarMascota,
+    SubirImgMascota,
     obtenerMascota,
     obtenerMascotas,
     actualizarMascota,
@@ -14,6 +15,9 @@ const upload = multer({ dest: 'uploads/' });
 
 // Crear una nueva mascota
 router.post('/mascota',upload.single('foto'), RegistrarMascota);
+
+//Subir imagen 
+router.post('/mascota/:id/foto', upload.single('foto'), SubirImgMascota);
 
 // Crear una nueva mascota sin foto
 router.post('/mascota-simple', RegistrarMascota);
