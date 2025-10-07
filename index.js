@@ -10,7 +10,7 @@ app.use(express.json());
 app.use((req, res, next) => {
   res.setHeader(
     "Content-Security-Policy",
-    "default-src 'self'; connect-src 'self' https://misterio07.alwaysdata.net/"
+    "default-src 'self'; connect-src 'self' https://misterio07.alwaysdata.net/ https://res.cloudinary.com https://api.cloudinary.com;"
   );
   next();
 });
