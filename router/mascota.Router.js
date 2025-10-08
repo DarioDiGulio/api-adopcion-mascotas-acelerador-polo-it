@@ -19,7 +19,7 @@ const upload = multer({ storage });
 router.post('/mascota', RegistrarMascota);
 
 //Subir imagen 
-router.post('/mascota/:id/foto', upload.single('foto'), SubirImgMascota);
+router.post('/mascota/foto/:id', upload.single('foto'), SubirImgMascota);
 
 // Crear una nueva mascota sin foto
 router.post('/mascota-simple', RegistrarMascota);
