@@ -33,6 +33,7 @@ router.get('/mascota/:id', obtenerMascota);
 router.put('/mascota/:id', actualizarMascota);
 // Eliminar una mascota por ID
 router.delete('/mascota/:id', eliminarMascota);
-
+// cambiar foto de mascota por id
+router.put('/mascota/foto/:id', upload.single('foto'), SubirImgMascota);
 module.exports = router;
 
