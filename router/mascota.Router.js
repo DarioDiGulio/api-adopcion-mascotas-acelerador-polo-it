@@ -16,7 +16,7 @@ const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
 // Crear una nueva mascota
-router.post('/mascota', RegistrarMascota);
+router.post('/api/mascota', RegistrarMascota);
 
 //Subir imagen 
 router.post('/api/mascota/:id/foto', upload.single('foto'), SubirImgMascota);
@@ -25,14 +25,14 @@ router.post('/api/mascota/:id/foto', upload.single('foto'), SubirImgMascota);
 router.post('/mascota-simple', RegistrarMascota);
 
 // Obtener todas las mascotas
-router.get('/mascotas', obtenerMascotas);
+router.get('/api/mascotas', obtenerMascotas);
 // Obtener una mascota por ID
-router.get('/mascota/:id', obtenerMascota);
+router.get('/api/mascota/:id', obtenerMascota);
 
 // Actualizar una mascota por ID
-router.put('/mascota/:id', actualizarMascota);
+router.put('/api/mascota/:id', actualizarMascota);
 // Eliminar una mascota por ID
-router.delete('/mascota/:id', eliminarMascota);
+router.delete('/api/mascota/:id', eliminarMascota);
 
 module.exports = router;
 

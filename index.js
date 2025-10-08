@@ -22,7 +22,7 @@ app.use(cors({
 }));
 
 
-app.use('/', mascotaRouter);
+app.use('/api', mascotaRouter);
 
 app.listen(PORT, () => {
     console.log(`Servidor corriendo en el puerto ${PORT}`);
