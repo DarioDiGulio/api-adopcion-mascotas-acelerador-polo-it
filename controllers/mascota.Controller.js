@@ -20,7 +20,46 @@ async function RegistrarMascota(req, res) {
         res.status(500).json({ error: err.message });
     }
 }
+const fs = require('fs');
+const path = require('path');
 
+// Subir imagen usando memoria y guardando en carpeta local 'uploads'
+async function SubirImgMascota(req, res) {
+    try {
+        const { id } = req.params;
+        console.log('Parametros recibidos:', req.params); 
+        console.log('Archivo recibido:', req.file);       
+
+        if (!req.file) 
+            return res.status(400).json({ message: 'No se ha subido ninguna imagen' });
+
+        // Crear carpeta uploads si no existe
+        const uploadDir = path.join(__dirname, '../uploads');
+        if (!fs.existsSync(uploadDir)) {
+            fs.mkdirSync(uploadDir, { recursive: true });
+        }
+
+        // Generar nombre único para el archivo
+        const ext = path.extname(req.file.originalname); // extensión original
+        const filename = `mascota_${id}_${Date.now()}${ext}`;
+        const filePath = path.join(uploadDir, filename);
+
+        // Guardar el archivo en la carpeta uploads
+        fs.writeFileSync(filePath, req.file.buffer);
+
+        // Guardar la ruta relativa en la base de datos
+        const fotoUrl = `/uploads/${filename}`; // esta ruta la usarías en tu frontend
+        await pool.execute('UPDATE mascotas SET foto_url = ? WHERE id = ?', [fotoUrl, id]);
+
+        res.json({ message: 'Imagen subida exitosamente', url: fotoUrl });
+
+    } catch (error) {
+        console.error('Error al subir la imagen:', error);
+        res.status(500).json({ message: 'Error al subir la imagen', error: error.message });
+    }
+}
+
+/*
 // Subir imagen usando memoria (sin tocar disco)
 async function SubirImgMascota(req, res) {
     try {
@@ -49,7 +88,7 @@ async function SubirImgMascota(req, res) {
         console.error('Error al subir la imagen:', error);
         res.status(500).json({ message: 'Error al subir la imagen', error: error.message });
     }
-}
+}*/
 //Obtener todas las mascotas
 async function obtenerMascotas(req, res) {
     try {
