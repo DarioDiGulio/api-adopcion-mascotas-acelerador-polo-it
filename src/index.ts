@@ -1,7 +1,6 @@
-const express = require('express');
-const cors = require('cors');
-
-const mascotaRouter = require('./router/mascota.Router');
+import express from 'express';
+import cors from 'cors';
+import mascotaRouter from './router/mascota.Router';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -21,9 +20,8 @@ app.use(cors({
   allowedHeaders: ['Content-Type']
 }));
 
-
 app.use('/', mascotaRouter);
 
 app.listen(PORT, () => {
-    console.log(`Servidor corriendo en el puerto ${PORT}`);
+  console.log(`Servidor corriendo en el puerto ${PORT}`);
 });

@@ -4,12 +4,20 @@ WORKDIR /app
 
 COPY package*.json ./
 
-RUN npm install --production
+# Install all dependencies (including devDependencies) for building
+RUN npm install
 
+# Copy source code
 COPY . .
+
+# Build TypeScript code
+RUN npm run build
+
+# Remove devDependencies after build
+RUN npm prune --production
 
 ENV NODE_ENV=production
 
 EXPOSE ${PORT}
 
-CMD ["node", "src/index.js"]
+CMD ["npm", "start"]
