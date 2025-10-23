@@ -17,7 +17,9 @@ RUN npm run build
 RUN npm prune --production
 
 ENV NODE_ENV=production
+# Expose the port the app listens on. Use a concrete value so Docker/Render
+# can parse the Dockerfile reliably. The app will still read process.env.PORT.
+EXPOSE 3000
 
-EXPOSE ${PORT}
-
+# Run the app
 CMD ["npm", "start"]
